@@ -33,11 +33,11 @@ export default function EmployeesForm({ required = false }) {
             }
         }
         fetchCafes()
-    }, [])
+    })
 
     // Set form initial values for edit
     useEffect(() => {
-        if (required && cafeNames) { 
+        if (required && cafeNames) {
             // Get assignedCafe name for intiial form values
             const selectedCafeId = cafeNames.find(c => c.label === employeeData.cafe_name)?.label;
             form.setFieldsValue({
