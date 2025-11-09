@@ -22,6 +22,8 @@ services:
       - db
     env_file:
       - ./backend/src/.env
+    volumes:
+      - ./backend/src/uploads:/app/src/uploads
 
   db:
     image: postgres:15
