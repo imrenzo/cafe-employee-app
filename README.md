@@ -2,11 +2,17 @@
 
 App that allows user to manage Cafes & Employees.
 
-## Requirements
-- Latest [docker](https://docs.docker.com/get-started/get-docker/)
-- Latest [docker-compose](https://docs.docker.com/compose/install/)
+URL of website [here](https://cafe-employee-app-frontend.onrender.com)
 
-## How to
+
+## How to Run App Locally
+
+***Requirements***
+
+- Have latest [docker](https://docs.docker.com/get-started/get-docker/)
+- Have latest [docker-compose](https://docs.docker.com/compose/install/)
+
+---
 
 1. Clone this repository in your local machine.
 
@@ -55,3 +61,7 @@ App that allows user to manage Cafes & Employees.
     ```
     docker-compose down
     ```
+
+-----
+## Documentation
+Some documentation information [here](./docs/)

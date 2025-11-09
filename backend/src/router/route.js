@@ -48,18 +48,6 @@ router.get('/cafes', handle(req => mediator.send(new GetCafesByLocationQuery(req
 router.get('/employees', handle(req => mediator.send(new GetEmployeesByCafeQuery(req.query))));
 
 // --- Commands ---
-router.post('/cafes', async (req, res) => {
-    try {
-        const { name, description, logo, location } = req.body
-        const query = new CreateNewCafeCommand({ name, description, logo, location })
-        response = await mediator.send(query)
-        res.status(201).json(response);
-    } catch (err) {
-        console.error('Error creating cafe:', err);
-        res.status(500).json({ error: err.message || 'Internal server error' });
-    }
-})
-
 // POST /upload endpoint for images
 router.post('/upload', upload.single('file'), (req, res) => {
     console.log("FILE : ", req.file)
