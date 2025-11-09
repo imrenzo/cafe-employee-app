@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const BASE_URL = 'http://localhost:3000'
+const BASE_URL = import.meta.env.VITE_API_URL
 export const IMAGE_URL = BASE_URL + '/upload'
 const api = axios.create({
     baseURL: BASE_URL,   // The base URL will be used for all requests

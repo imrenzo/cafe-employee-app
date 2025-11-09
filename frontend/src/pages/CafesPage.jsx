@@ -34,8 +34,9 @@ function CafesTable({ cafes, setCafes }) {
             headerName: "Logo",
             field: "logo",
             cellRenderer: (params) => {
-                const defaultImg = "http://localhost:3000/uploads/noImageFound.png"
-                const imgURL = params.value ? "http://localhost:3000" + params.value : defaultImg
+                const BASE_URL = import.meta.env.VITE_API_URL
+                const defaultImg = BASE_URL + "/uploads/noImageFound.png"
+                const imgURL = params.value ? BASE_URL + params.value : defaultImg
                 return (
                     <img
                         src={imgURL}
@@ -50,8 +51,12 @@ function CafesTable({ cafes, setCafes }) {
                     />
                 )
             },
+            flex: 1
         },
-        { field: "name" },
+        {
+            field: "name",
+            flex: 1
+        },
         {
             field: "description",
             cellStyle: { 'whiteSpace': 'normal' },
@@ -71,13 +76,14 @@ function CafesTable({ cafes, setCafes }) {
                 onDelete: (deletedId) => {
                     setCafes(prev => prev.filter(cafe => cafe.id !== deletedId));
                 }
-            }
+            },
+            flex: 1
         },
     ]);
 
     return (<>
-        <div className="flex flex-col h-[75vh]">
-            {/* Grid only takes up (75vh - space for <AddEmployeeButton/>) */}
+        {/* Height = 100vh - header height - layout vertical padding */}
+        <div className="flex flex-col" style={{ height: 'calc(100vh - 64px - 48px)' }}>
             <div className="flex-1 overflow-auto">
                 <AgGridReact
                     rowData={cafes}
@@ -86,9 +92,7 @@ function CafesTable({ cafes, setCafes }) {
                     rowHeight={100}
                 />
             </div>
-
-            {/* Button below */}
-            <div className="mt-2">
+            <div className="mt-2 p-2 bg-white shadow">
                 <AddCafeButton />
             </div>
         </div>

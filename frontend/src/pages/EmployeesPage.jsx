@@ -32,27 +32,33 @@ function EmployeesTable({ employees, setEmployees }) {
     const [colDefs, _] = useState([
         {
             headerName: 'Employee id',
-            field: "id"
+            field: "id",
+            flex: 1
         },
         {
             headerName: 'Name',
-            field: "employee_name"
+            field: "employee_name",
+            flex: 1
         },
         {
             headerName: 'Email Address',
             field: "email_address",
+            flex: 1
         },
         {
             headerName: 'Phone number',
             field: "phone_number",
+            flex: 1
         },
         {
             headerName: 'Days worked in the café',
-            field: "dayDiff"
+            field: "dayDiff",
+            flex: 1
         },
         {
             headerName: 'Café name',
-            field: "cafe_name"
+            field: "cafe_name",
+            flex: 1
         },
         {
             colId: "actions",
@@ -67,9 +73,9 @@ function EmployeesTable({ employees, setEmployees }) {
         },
     ]);
 
-    return (
-        <div className="flex flex-col h-[75vh]">
-            {/* Grid only takes up (75vh - space for <AddEmployeeButton/>) */}
+    return (<>
+        {/* Height = 100vh - header height - layout vertical padding */}
+        <div className="flex flex-col" style={{ height: 'calc(100vh - 64px - 48px)' }}>
             <div className="flex-1 overflow-auto">
                 <AgGridReact
                     rowData={employees}
@@ -77,12 +83,10 @@ function EmployeesTable({ employees, setEmployees }) {
                     domLayout="normal"
                 />
             </div>
-
-            {/* Button below */}
             <div className="mt-2">
                 <AddEmployeeButton />
             </div>
         </div>
-    )
+    </>)
 }
 
