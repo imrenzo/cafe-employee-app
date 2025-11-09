@@ -1,5 +1,4 @@
 // Contains button for Employees page table
-
 import { Button } from 'antd'
 import { Link } from 'react-router-dom';
 import { EmployeesAPI } from '../api';

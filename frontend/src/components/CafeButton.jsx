@@ -1,5 +1,4 @@
 // Contains button for Cafes page table
-
 import { Button } from 'antd'
 import { Link } from 'react-router-dom';
 import { CafesAPI } from '../api';

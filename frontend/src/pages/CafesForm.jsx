@@ -1,13 +1,14 @@
-import { Button, Form, Input, message, Upload } from 'antd';
+import { Button, Form, message, Upload } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { CafesAPI, IMAGE_URL } from '../api';
+import { CafesAPI } from '../api';
 import Textbox from '../components/TextBox';
 import WarnButton from '../components/WarnButton';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setClean, setDirty } from '../redux/slices/formSlice';
 import { UploadOutlined } from '@ant-design/icons';
 import getUploadProps from '../props/uploadImageProps';
+import { useState } from 'react';
 
 export default function CafesForm({ required = false }) {
     const location = useLocation();
@@ -26,7 +27,7 @@ export default function CafesForm({ required = false }) {
                 logo: cafeData.logo,
             })
         }
-    }, [cafeData, form, required]);
+    }, []);
 
     const handleSubmit = async (values) => {
         const { name, location, description, logo } = values
@@ -45,6 +46,7 @@ export default function CafesForm({ required = false }) {
                     throw new Error("Error updating ", name)
                 } else {
                     messageApi.info('Successfully updated: ' + name);
+                    dispatch(setClean())
                     navigate(-1);
                 }
             } else {
@@ -70,11 +72,10 @@ export default function CafesForm({ required = false }) {
 
     // Check whether form values has been changed
     const dispatch = useDispatch()
-    const isDirty = useSelector(state => state.form.isDirty)
-
+    const [localDirty, setLocalDirty] = useState(false);
     // warning message: handles browser native navigation e.g. Reloading page
     useEffect(() => {
-        if (!isDirty) return;
+        if (!localDirty) return;
 
         const handleBeforeUnload = (e) => {
             e.preventDefault();
@@ -84,10 +85,16 @@ export default function CafesForm({ required = false }) {
         window.addEventListener('beforeunload', handleBeforeUnload);
 
         return () => {
-            dispatch(setClean())
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-    }, [dispatch, isDirty]);
+    }, [localDirty]);
+
+    const handleValuesChange = () => {
+        if (!localDirty) {
+            setLocalDirty(true)
+            dispatch(setDirty())
+        }
+    }
 
     return (<div style={{ width: '100%', maxWidth: 600 }}>
         {contextHolder}
@@ -98,7 +105,7 @@ export default function CafesForm({ required = false }) {
             size="default"
             style={{ maxWidth: 600 }}
             onFinish={handleSubmit}
-            onValuesChange={() => { dispatch(setDirty()) }}
+            onValuesChange={handleValuesChange}
             labelAlign="left"
         >
             <Textbox label="Name" name="name" minLength={6} maxLength={10} required />

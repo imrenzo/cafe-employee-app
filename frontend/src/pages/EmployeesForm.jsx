@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { CafesAPI, EmployeesAPI } from '../api';
 import Textbox from '../components/TextBox';
 import WarnButton from '../components/WarnButton';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setClean, setDirty } from '../redux/slices/formSlice';
 
 export default function EmployeesForm({ required = false }) {
@@ -28,27 +28,25 @@ export default function EmployeesForm({ required = false }) {
                 const cafeNames = await CafesAPI["list"](location);
                 const cafe_name_id = cafeNames.data.map(c => { return { label: c.name, value: c.id } })
                 setCafeNames(cafe_name_id)
+
+                // Set form initial values for edit
+                if (required) {
+                    // Get assignedCafe name for intiial form values
+                    const selectedCafeId = cafe_name_id.find(c => c.label === employeeData.cafe_name)?.label;
+                    form.setFieldsValue({
+                        name: employeeData.employee_name,
+                        emailAddress: employeeData.email_address,
+                        phoneNumber: employeeData.phone_number,
+                        gender: employeeData.gender,
+                        assignedCafe: selectedCafeId
+                    })
+                }
             } catch (err) {
                 console.error("Error fetching employees: ", err)
             }
         }
         fetchCafes()
-    })
-
-    // Set form initial values for edit
-    useEffect(() => {
-        if (required && cafeNames) {
-            // Get assignedCafe name for intiial form values
-            const selectedCafeId = cafeNames.find(c => c.label === employeeData.cafe_name)?.label;
-            form.setFieldsValue({
-                name: employeeData.employee_name,
-                emailAddress: employeeData.email_address,
-                phoneNumber: employeeData.phone_number,
-                gender: employeeData.gender,
-                assignedCafe: selectedCafeId
-            })
-        }
-    }, [employeeData, cafeNames, form, required]);
+    }, [])
 
     const handleSubmit = async (values) => {
         const { name: name, emailAddress: emailAddress, phoneNumber: phoneNumber, gender: gender, assignedCafe: assignedCafe } = values
@@ -70,6 +68,7 @@ export default function EmployeesForm({ required = false }) {
                     throw new Error("Error updating employee ", name)
                 } else {
                     messageApi.info('Successfully updated employee: ' + name);
+                    dispatch(setClean())
                     navigate(-1);
                 }
             } else {
@@ -97,11 +96,11 @@ export default function EmployeesForm({ required = false }) {
 
     // Check whether form values has been changed
     const dispatch = useDispatch()
-    const isDirty = useSelector(state => state.form.isDirty)
+    const [localDirty, setLocalDirty] = useState(false);
 
     // warning message: handles browser native navigation e.g. reloading page
     useEffect(() => {
-        if (!isDirty) return;
+        if (!localDirty) return;
 
         const handleBeforeUnload = (e) => {
             e.preventDefault();
@@ -111,10 +110,16 @@ export default function EmployeesForm({ required = false }) {
         window.addEventListener('beforeunload', handleBeforeUnload);
 
         return () => {
-            dispatch(setClean())
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-    }, [dispatch, isDirty]);
+    }, [localDirty]);
+
+    const handleValuesChange = () => {
+        if (!localDirty) {
+            setLocalDirty(true)
+            dispatch(setDirty())
+        }
+    }
 
     return (<div style={{ width: '100%', maxWidth: 600 }}>
         {contextHolder}
@@ -125,7 +130,7 @@ export default function EmployeesForm({ required = false }) {
             size="default"
             style={{ maxWidth: 600 }}
             onFinish={handleSubmit}
-            onValuesChange={() => { dispatch(setDirty()) }}
+            onValuesChange={handleValuesChange}
             labelAlign="left"
         >
             <Textbox label="Name" name="name" minLength={6} maxLength={10} required />

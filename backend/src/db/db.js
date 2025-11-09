@@ -1,8 +1,8 @@
 require('dotenv').config(); // MUST be first
 
 const pgp = require('pg-promise')();
+// production: PG_HOST=db, development: PG_HOST=localhost
 const db = pgp({
-    // production: PG_HOST=db, development: PG_HOST=localhost
     host: process.env.PG_HOST,
     port: Number(process.env.PG_PORT),
     database: process.env.PG_DATABASE,
