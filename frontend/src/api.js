@@ -1,12 +1,12 @@
 import axios from "axios"
 
+const BASE_URL = import.meta.env.VITE_API_URL
 console.log('====== API CONFIG DEBUG ======');
 console.log('import.meta.env.VITE_API_URL:', import.meta.env.VITE_API_URL);
 console.log('BASE_URL:', BASE_URL);
 console.log('All env vars:', import.meta.env);
 console.log('============================');
 
-const BASE_URL = import.meta.env.VITE_API_URL
 export const IMAGE_URL = BASE_URL + '/upload'
 const api = axios.create({
     baseURL: BASE_URL,   // The base URL will be used for all requests
