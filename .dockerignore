@@ -1,0 +1,14 @@
+# Node modules
+node_modules
+**/node_modules
+
+# Build directories
+**/dist
+**/Build
+
+# Environment files
+.env
+**/.env
+
+# For testing backend
+.http
