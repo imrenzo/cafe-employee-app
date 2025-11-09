@@ -62,6 +62,7 @@ router.post('/cafes', async (req, res) => {
 
 // POST /upload endpoint for images
 router.post('/upload', upload.single('file'), (req, res) => {
+    console.log("FILE : ", req.file)
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
     }

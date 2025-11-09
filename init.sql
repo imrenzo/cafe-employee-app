@@ -1,4 +1,3 @@
-
 CREATE SEQUENCE employee_seq START 0 MINVALUE 0 INCREMENT 1;
 CREATE TABLE IF NOT EXISTS employees (
     seq_id BIGINT DEFAULT nextval('employee_seq'),
@@ -47,7 +46,7 @@ BEGIN
     FOR i IN 1..50 LOOP
         INSERT INTO employees (name, email_address, phone_number, gender)
         VALUES (
-            first_names[i],
+            first_names[i] || ' ' || last_names[i],
             LOWER(first_names[i] || '.' || last_names[i] || '@gmail.com'),
             (8 + FLOOR(random() * 2))::INT || LPAD((FLOOR(random() * 10000000))::TEXT,7,'0'),  -- starts with 8 or 9
             genders[1 + (i % 2)]
@@ -63,8 +62,8 @@ DECLARE
         'Brew & Co', 'Cuppa Corner', 'The Coffee Spot', 'Espresso Express', 'Bean There'
     ];
     locations TEXT[] := ARRAY[
-        'orchard','marina','clementi','tanjong_pagar','bugis',
-        'holland_village','toa_payoh','bishan','novena','bukit_timah'
+        'orchard','marina','clementi','tanjong pagar','bugis',
+        'holland village','toa payoh','bishan','novena','bukit timah'
     ];
     i INT;
 BEGIN

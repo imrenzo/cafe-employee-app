@@ -32,7 +32,7 @@ export default function EmployeesForm({ required = false }) {
                 // Set form initial values for edit
                 if (required) {
                     // Get assignedCafe name for intiial form values
-                    const selectedCafeId = cafe_name_id.find(c => c.label === employeeData.cafe_name)?.label;
+                    const selectedCafeId = cafe_name_id.find(c => c.label === employeeData.cafe_name)?.value;
                     form.setFieldsValue({
                         name: employeeData.employee_name,
                         emailAddress: employeeData.email_address,
@@ -133,8 +133,8 @@ export default function EmployeesForm({ required = false }) {
             onValuesChange={handleValuesChange}
             labelAlign="left"
         >
-            <Textbox label="Name" name="name" minLength={6} maxLength={10} required />
-            <Textbox label="Email Address" name="emailAddress" type="email" required />
+            <Textbox label="Name" name="name" minLength={6} maxLength={100} required />
+            <Textbox label="Email Address" name="emailAddress" type="email" maxLength={255} required />
             <Textbox label="Phone Number" name="phoneNumber" type="phone" required />
             <Form.Item name="gender" label="Gender">
                 <Radio.Group>

@@ -6,7 +6,10 @@ RUN npm install
 COPY . .
 
 # ensure uploads folder exists
-RUN mkdir -p /app/uploads
+RUN mkdir -p /app/src/uploads
+
+# Change working directory to src for running the app
+WORKDIR /app/src
 
 EXPOSE 3000
-CMD ["node", "src/app.js"]
+CMD ["node", "app.js"]

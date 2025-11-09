@@ -108,14 +108,14 @@ export default function CafesForm({ required = false }) {
             onValuesChange={handleValuesChange}
             labelAlign="left"
         >
-            <Textbox label="Name" name="name" minLength={6} maxLength={10} required />
-            <Textbox label="Description" name="description" maxLength={256} required />
+            <Textbox label="Name" name="name" minLength={6} maxLength={100} required />
+            <Textbox label="Description" name="description" maxLength={255} required />
             <Form.Item label="Logo" name="logo">
                 <Upload {...getUploadProps(form)}>
                     <Button icon={<UploadOutlined />}>Click to Upload</Button>
                 </Upload>
             </Form.Item>
-            <Textbox label="Location" name="location" />
+            <Textbox label="Location" name="location" maxLength={255} required />
             <div className='flex flex-row space-x-5'>
                 <WarnButton className='w-1/2' />
                 <Button htmlType="submit" type="primary" className='w-1/2'>Submit</Button>
