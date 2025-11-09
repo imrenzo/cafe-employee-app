@@ -13,9 +13,8 @@ export const AppLayout = ({ children }) => {
                     style={{
                         paddingTop: 24,
                         paddingBottom: 24,
-                        marginLeft: '5%',
-                        marginRight: '5%',
-                        margin: 0,
+                        paddingLeft: '10%',
+                        paddingRight: '10%',
                         minHeight: 280,
                         borderRadius: 0,
                     }}
