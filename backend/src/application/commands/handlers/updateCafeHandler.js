@@ -2,6 +2,7 @@ const AbstractHandlerInterface = require("../../abstractHandlerInterface");
 const Cafe = require("../../../models/cafe");
 const db = require("../../../db/db");
 
+// Handles updating of cafe with database interactions
 class UpdateCafeHandler extends AbstractHandlerInterface {
     async handle(command) {
         const { cafeId, name, description, logo, location } = command;
@@ -14,7 +15,7 @@ class UpdateCafeHandler extends AbstractHandlerInterface {
         }
 
         const params = [cafeId]
-        let sql = `UPDATE cafes SET`
+        let sql = `UPDATE cafes SET `
         const tmpSql = []
 
         // dynmically add positional args to sql and params
@@ -43,7 +44,6 @@ class UpdateCafeHandler extends AbstractHandlerInterface {
 
         sql += ' WHERE id = $1'
         await db.none(sql, params)
-        return cafeId
     }
 }
 

@@ -1,24 +1,15 @@
 const express = require('express')
 const router = express.Router()
-const db = require('../db/db')
+const multer = require('multer');
+const path = require('path');
+const mediator = require('../application/mediatorManager')
 
-// middleware for dev
-const timeLog = (req, res, next) => {
-    console.log('Time: ', Date.now())
-    next()
-}
-router.use(timeLog)
-
-// handle routing
-const mediator = require('../application/mediator')
+// middleware
+const timeLog = router.use((req, res, next) => { console.log('Time: ', Date.now()), next() })
 
 // Query functions
 const GetCafesByLocationQuery = require('../application/queries/getCafesByLocationQuery')
 const GetEmployeesByCafeQuery = require('../application/queries/getEmployeesByCafeQuery')
-// Query mediators
-mediator.register('GetCafesByLocationQuery', require('../application/queries/handlers/getCafesByLocationHandler'))
-mediator.register('GetEmployeesByCafeQuery', require('../application/queries/handlers/getEmployeesByCafeHandler'))
-
 // Command functions
 const CreateNewCafeCommand = require('../application/commands/createNewCafeCommand')
 const CreateNewEmployeeCommand = require('../application/commands/createNewEmployeeCommand')
@@ -26,49 +17,42 @@ const UpdateCafeCommand = require('../application/commands/updateCafeCommand')
 const UpdateEmployeeCommand = require('../application/commands/updateEmployeeCommand')
 const DeleteCafeCommand = require('../application/commands/deleteCafeCommand')
 const DeleteEmployeeCommand = require('../application/commands/deleteEmployeeCommand')
-// POST command
-mediator.register('CreateNewCafeCommand', require('../application/commands/handlers/createNewCafeHandler'))
-mediator.register('CreateNewEmployeeCommand', require('../application/commands/handlers/createNewEmployeeHandler'))
-// PUT
-mediator.register('UpdateCafeCommand', require('../application/commands/handlers/updateCafeHandler'))
-mediator.register('UpdateEmployeeCommand', require('../application/commands/handlers/updateEmployeeHandler'))
-// DELETE
-mediator.register('DeleteCafeCommand', require('../application/commands/handlers/deleteCafeHandler'))
-mediator.register('DeleteEmployeeCommand', require('../application/commands/handlers/deleteEmployeeHandler'))
 
+// --- Image upload ---
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // make sure this folder exists
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
 
-// queries
-router.get('/cafes', async (req, res) => {
+// --- Helper for async handlers ---
+const handle = (fn, status = 200) => async (req, res) => {
     try {
-        const { location } = req.query
-        const query = new GetCafesByLocationQuery({ location })
-        response = await mediator.send(query)
-        console.log(response)
+        const data = await fn(req);
+        res.status(status).json(data);
     } catch (err) {
-        console.error('Error fetching cafes:', err);
+        console.error('Error:', err);
         res.status(500).json({ error: err.message || 'Internal server error' });
     }
-})
+};
 
-router.get('/employees', async (req, res) => {
-    try {
-        const { cafe } = req.query
-        const query = new GetEmployeesByCafeQuery({ cafe })
-        response = await mediator.send(query)
-        console.log(response)
-    } catch (err) {
-        console.error('Error fetching employees:', err);
-        res.status(500).json({ error: err.message || 'Internal server error' });
-    }
-})
+// --- Queries ---
+// For each GET method, create a path with handle ftn
+// Get data fields from req.query
+router.get('/cafes', handle(req => mediator.send(new GetCafesByLocationQuery(req.query))))
+router.get('/employees', handle(req => mediator.send(new GetEmployeesByCafeQuery(req.query))));
 
-// commands
+// --- Commands ---
 router.post('/cafes', async (req, res) => {
     try {
         const { name, description, logo, location } = req.body
         const query = new CreateNewCafeCommand({ name, description, logo, location })
         response = await mediator.send(query)
-        console.log(response)
         res.status(201).json(response);
     } catch (err) {
         console.error('Error creating cafe:', err);
@@ -76,67 +60,27 @@ router.post('/cafes', async (req, res) => {
     }
 })
 
-router.post('/employees', async (req, res) => {
-    try {
-        const { name, emailAddress, phoneNumber, gender, cafeId } = req.body
-        const query = new CreateNewEmployeeCommand({ name, emailAddress, phoneNumber, gender, cafeId })
-        response = await mediator.send(query)
-        console.log(response)
-    } catch (err) {
-        console.error('Error creating employees:', err);
-        res.status(500).json({ error: err.message || 'Internal server error' });
-    }
-})
+// POST /upload endpoint for images
+router.post('/upload', upload.single('file'), (req, res) => {
+    req.file
+        ? res.status(400).json({ error: 'No file uploaded' })
+        : res.status(200).json({ url: `/uploads/${req.file.filename}` })
+});
 
-router.put('/cafes', async (req, res) => {
-    try {
-        // cafeId used to amend data in db
-        const { cafeId, name, description, logo, location } = req.body
-        const query = new UpdateCafeCommand({ cafeId, name, description, logo, location })
-        response = await mediator.send(query)
-        console.log(response)
-    } catch (err) {
-        console.error('Error updating cafe:', err);
-        res.status(500).json({ error: err.message || 'Internal server error' });
-    }
-})
+// --- Commands ---
+const routes = [
+    ['post', '/cafes', CreateNewCafeCommand, 201],
+    ['post', '/employees', CreateNewEmployeeCommand, 201],
+    ['put', '/cafes', UpdateCafeCommand, 202],
+    ['put', '/employees', UpdateEmployeeCommand, 202],
+    ['delete', '/cafes', DeleteCafeCommand, 202],
+    ['delete', '/employees', DeleteEmployeeCommand, 202]
+];
 
-router.put('/employees', async (req, res) => {
-    try {
-        const { employeeId, name, emailAddress, phoneNumber, gender, newCafeId, start_date } = req.body
-        const query = new UpdateEmployeeCommand(
-            { employeeId, name, emailAddress, phoneNumber, gender, newCafeId, start_date }
-        )
-        response = await mediator.send(query)
-        console.log(response)
-    } catch (err) {
-        console.error('Error updating employee:', err);
-        res.status(500).json({ error: err.message || 'Internal server error' });
-    }
-})
-
-router.delete('/cafes', async (req, res) => {
-    try {
-        const { cafeId } = req.body
-        const query = new DeleteCafeCommand({ cafeId })
-        response = await mediator.send(query)
-        console.log(response)
-    } catch (err) {
-        console.error('Error deleting cafe:', err);
-        res.status(500).json({ error: err.message || 'Internal server error' });
-    }
-})
-
-router.delete('/employees', async (req, res) => {
-    try {
-        const { employeeId } = req.body
-        const query = new DeleteEmployeeCommand({ employeeId })
-        response = await mediator.send(query)
-        console.log(response)
-    } catch (err) {
-        console.error('Error deleting employee:', err);
-        res.status(500).json({ error: err.message || 'Internal server error' });
-    }
-})
+// For each http request method, create a path with handle ftn
+// Get data fields from req.body
+routes.forEach(([method, path, Command, status]) =>
+    router[method](path, handle(req => mediator.send(new Command(req.body)), status))
+);
 
 module.exports = router

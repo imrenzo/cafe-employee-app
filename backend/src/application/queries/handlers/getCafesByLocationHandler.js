@@ -1,12 +1,10 @@
 const db = require('../../../db/db')
 const AbstractHandlerInterface = require('../../abstractHandlerInterface');
 
+// Handles querying cafes with database interactions
 class GetCafesByLocationHandler extends AbstractHandlerInterface {
     async handle(query) {
-        console.log("GetCafesIn " + JSON.stringify(query))
         const location = query.location
-        console.log(location)
-
         const validLocation = await this.#isValidLocation(location)
         if (!validLocation) return []
 
@@ -26,12 +24,11 @@ class GetCafesByLocationHandler extends AbstractHandlerInterface {
         // Add employees field to cafes
         const res = cafes.map(cafe => {
             const cafeId = cafe.id
-            const cafeEmployees = employees
-                .filter(c => c.cafe_id == cafeId) // Filter for employees belonging to that cafe
-                .map(c => c.employee_id) // Get employees id for that cafe
+            const numberOfEmployees = employees
+                .filter(c => c.cafe_id == cafeId).length // Filter for employees belonging to that cafe
             return {
                 ...cafe,
-                employees: cafeEmployees // contains id of all cafe employees
+                employees: numberOfEmployees // contains id of all cafe employees
             }
         })
 

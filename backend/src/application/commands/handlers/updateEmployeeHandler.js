@@ -2,10 +2,12 @@ const AbstractHandlerInterface = require("../../abstractHandlerInterface");
 const Cafe = require("../../../models/cafe");
 const db = require("../../../db/db");
 const Employee = require("../../../models/employee");
+const dayjs = require("dayjs");
 
+// Handles updating of employee with database interactions
 class UpdateEmployeeHandler extends AbstractHandlerInterface {
     async handle(command) {
-        const { employeeId, name, emailAddress, phoneNumber, gender, newCafeId, start_date } = command;
+        const { employeeId, name, emailAddress, phoneNumber, gender, newCafeId } = command;
         // validate inputs
         if (newCafeId && !(await Cafe.isValidCafeId(newCafeId))) {
             throw new Error("Invalid new cafe id")
@@ -16,19 +18,35 @@ class UpdateEmployeeHandler extends AbstractHandlerInterface {
         if (!Employee.isValidEmployeeFields({name: name, email: emailAddress, phone: phoneNumber, gender: gender})) {
             throw new Error("Invalid employee fields")
         }
+
         const updateEmployee = this.#updateEmployee({ employeeId, name, emailAddress, phoneNumber, gender })
         let updateCafeEmployee = null
         if (newCafeId) {
             updateCafeEmployee = this.#updateCafeEmployee({ employeeId, newCafeId })
         }
-        // handle employee already in same cafe id?
+
         await Promise.all([updateEmployee, updateCafeEmployee])
         return newCafeId
     }
 
     async #updateCafeEmployee({ employeeId, newCafeId }) {
-        const sql = `UPDATE employee_cafe SET cafe_id = $1 WHERE employee_id = $2`
+        // Get employee current cafeId before update
+        const { currentCafeId } = await db.one(
+            `SELECT cafe_id FROM employee_cafe WHERE employee_id = $1`,
+            [employeeId]
+        );
+
+        let sql = `UPDATE employee_cafe SET cafe_id = $1 `
         const params = [newCafeId, employeeId]
+
+        // Update start_date if different cafe
+        if (currentCafeId != newCafeId) {
+            sql += ', start_date = $3 '
+            params.push(new dayjs().format('YYYY-MM-DD'))
+        }
+
+        sql += ' WHERE employee_id = $2'
+        params.push()
         return db.none(sql, params)
     }
 

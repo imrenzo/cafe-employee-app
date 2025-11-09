@@ -1,5 +1,6 @@
 const db = require("../db/db")
 
+// Cafe class that contains methods to validate its fields to match database constraints
 class Cafe {
     static async isValidCafeId(cafeId) {
         // Remove whitespaces (if any)
@@ -12,7 +13,9 @@ class Cafe {
         const arr = [name, description, location]
         const hasNull = arr.some(e => e == null)
         if (hasNull) return false
-
+        if (logo && (logo.size > 2 * 1024 * 1024)) { // logo size <= 2MB
+            return false;
+        }
         return true
     }
 }

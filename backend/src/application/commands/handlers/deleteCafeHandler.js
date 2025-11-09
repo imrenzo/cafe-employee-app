@@ -2,6 +2,7 @@ const db = require('../../../db/db');
 const Cafe = require('../../../models/cafe');
 const AbstractHandlerInterface = require('../../abstractHandlerInterface');
 
+// Handles deletion of cafe with database interactions
 class DeleteCafeHandler extends AbstractHandlerInterface {
     async handle(command) {
         const { cafeId } = command
@@ -23,7 +24,7 @@ class DeleteCafeHandler extends AbstractHandlerInterface {
         `
         const deleteCafes = db.none(sqlCafes, [cafeId])
 
-        // employee_cafe table cascade delete so dont need to query
+        // employee_cafe table cascade delete so don't have to make any sql query
         await Promise.all([deleteEmployees, deleteCafes])
     }
 }

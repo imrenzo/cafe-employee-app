@@ -4,6 +4,7 @@ const Employee = require('../../../models/employee');
 const Cafe = require('../../../models/cafe');
 const AbstractHandlerInterface = require('../../abstractHandlerInterface');
 
+// Handles creation of new employee with database interactions
 class CreateNewEmployeeHandler extends AbstractHandlerInterface {
     async handle(command) {
         const { name, emailAddress, phoneNumber, gender, cafeId } = command;
@@ -14,6 +15,8 @@ class CreateNewEmployeeHandler extends AbstractHandlerInterface {
         if (cafeId && !(await Cafe.isValidCafeId(cafeId))) {
             throw new Error("Invalid cafe id")
         }
+        // insert employee into employees table
+        // then insert into employee_cafe using UUID generated from db
         const sql = `
             WITH new_employee AS (
                 INSERT INTO employees (name, email_address, phone_number, gender) 

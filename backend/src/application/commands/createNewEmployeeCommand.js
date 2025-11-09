@@ -1,3 +1,4 @@
+// Object to store data to be passed to mediator
 class CreateNewEmployeeCommand {
     constructor({ name, emailAddress, phoneNumber, gender, cafeId }) {
         this.name = name

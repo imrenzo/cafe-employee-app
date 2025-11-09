@@ -1,3 +1,4 @@
+// Object to store data to be passed to mediator
 class UpdateEmployeeCommand {
     constructor({ employeeId, name, emailAddress, phoneNumber, gender, newCafeId, start_date }) {
         this.employeeId = employeeId

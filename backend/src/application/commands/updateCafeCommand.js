@@ -1,3 +1,4 @@
+// Object to store data to be passed to mediator
 class UpdateCafeCommand {
     constructor({ cafeId, name, description, logo, location }) {
         this.cafeId = cafeId
