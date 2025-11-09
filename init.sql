@@ -84,15 +84,17 @@ DO $$
 DECLARE
     emp RECORD;
     cafe_ids UUID[];
+    days_ago INT;
 BEGIN
     SELECT array_agg(id) INTO cafe_ids FROM cafes;
 
     FOR emp IN SELECT id FROM employees LOOP
+        days_ago := FLOOR(random() * 30)::INT;
         INSERT INTO employee_cafe (employee_id, cafe_id, start_date)
         VALUES (
             emp.id,
             cafe_ids[1 + FLOOR(random() * array_length(cafe_ids,1))],  -- random cafe
-            CURRENT_DATE - (FLOOR(random() * 30))  -- random start date in last 30 days
+            CURRENT_DATE - days_ago  -- random start date in last 30 days
         );
     END LOOP;
 END $$;
