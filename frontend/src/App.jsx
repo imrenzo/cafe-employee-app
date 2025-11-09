@@ -16,9 +16,6 @@ function App() {
         <AppLayout>
           <Routes>
             <Route path='/' element={<CafesPages />} />
-            {/* <Route path='/' element={<CafesPages />} />
-        <Route path='/' element={<CafesPages />} />
-        <Route path='/' element={<CafesPages />} /> */}
             <Route path='/employees/cafe/:cafeName' element={<EmployeesPage />} />
             <Route path='/employees/' element={<EmployeesPage />} />
 
