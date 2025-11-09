@@ -10,11 +10,15 @@ ModuleRegistry.registerModules([SetFilterModule]);
 export default function CafesPages() {
     const [cafes, setCafes] = useState(null)
     const [location, _] = useState(null)
+    console.log("CafesPages")
 
     useEffect(() => {
+        console.log("fetching cafes")
         const fetchCafes = async () => {
             try {
+                console.log("awaiting api")
                 const cafes = await CafesAPI["list"](location);
+                console.log("receive api result ", cafes)
                 setCafes(cafes.data)
             } catch (err) {
                 console.error("Error fetching cafes: ", err)
