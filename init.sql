@@ -47,7 +47,7 @@ BEGIN
     FOR i IN 1..50 LOOP
         INSERT INTO employees (name, email_address, phone_number, gender)
         VALUES (
-            first_names[i] || ' ' || last_names[i],
+            first_names[i],
             LOWER(first_names[i] || '.' || last_names[i] || '@gmail.com'),
             (8 + FLOOR(random() * 2))::INT || LPAD((FLOOR(random() * 10000000))::TEXT,7,'0'),  -- starts with 8 or 9
             genders[1 + (i % 2)]

@@ -21,7 +21,7 @@ const DeleteEmployeeCommand = require('../application/commands/deleteEmployeeCom
 // --- Image upload ---
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/'); // make sure this folder exists
+        cb(null, 'uploads/');
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -62,9 +62,10 @@ router.post('/cafes', async (req, res) => {
 
 // POST /upload endpoint for images
 router.post('/upload', upload.single('file'), (req, res) => {
-    req.file
-        ? res.status(400).json({ error: 'No file uploaded' })
-        : res.status(200).json({ url: `/uploads/${req.file.filename}` })
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    res.status(200).json({ url: `/uploads/${req.file.filename}` });
 });
 
 // --- Commands ---
